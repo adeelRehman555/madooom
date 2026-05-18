@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
-import { fetchCloudinaryImages } from '../lib/cloudinary';
 import { syncMediaToDatabase, getMediaFromDatabase, uploadMediaFile, deleteMediaById } from '../lib/database';
 
 interface Picture {
-  id: string;
+  id?: number | string;
   url: string;
   type: 'image';
   name: string;
@@ -38,12 +37,12 @@ const Pictures: React.FC<PicturesProps> = ({ onLogoutClick, onNavigate }) => {
       setError('');
       
       // Sync media from Cloudinary to database
-      const synced = await syncMediaToDatabase();
+      await syncMediaToDatabase();
       
       // Fetch pictures from database
       const dbPictures = await getMediaFromDatabase('image');
       
-      setPictures(dbPictures);
+      setPictures(dbPictures as Picture[]);
       if (dbPictures.length === 0) {
         setError('No pictures found');
       }
@@ -91,8 +90,9 @@ const Pictures: React.FC<PicturesProps> = ({ onLogoutClick, onNavigate }) => {
     }
   };
 
-  const handleDeleteClick = (id: string, name: string) => {
-    setDeleteConfirm({ show: true, id, name });
+  const handleDeleteClick = (id: string | number | undefined, name: string | undefined) => {
+    if (!id || !name) return;
+    setDeleteConfirm({ show: true, id: String(id), name });
     setDeleteMessage('');
   };
 
@@ -249,7 +249,7 @@ const Pictures: React.FC<PicturesProps> = ({ onLogoutClick, onNavigate }) => {
                   </button>
                   {/* Delete button */}
                   <button
-                    onClick={() => handleDeleteClick(pic.id, pic.name)}
+                    onClick={() => pic.id && handleDeleteClick(pic.id, pic.name)}
                     className="absolute top-0 right-0 bg-red-500/80 hover:bg-red-600 text-white p-1 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                     title="Delete picture"
                   >

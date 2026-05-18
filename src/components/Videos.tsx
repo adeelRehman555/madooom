@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
-import { fetchCloudinaryVideos } from '../lib/cloudinary';
 import { syncMediaToDatabase, getMediaFromDatabase, uploadMediaFile, deleteMediaById } from '../lib/database';
 
 interface Video {
-  id: string;
+  id?: number | string;
   url: string;
   type: 'video';
   name: string;
@@ -23,7 +22,6 @@ const Videos: React.FC<VideosProps> = ({ onLogoutClick, onNavigate }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id?: string; name?: string }>({ show: false });
   const [deleteMessage, setDeleteMessage] = useState('');
@@ -40,12 +38,12 @@ const Videos: React.FC<VideosProps> = ({ onLogoutClick, onNavigate }) => {
       setError('');
       
       // Sync media from Cloudinary to database
-      const synced = await syncMediaToDatabase();
+      await syncMediaToDatabase();
       
       // Fetch videos from database
       const dbVideos = await getMediaFromDatabase('video');
       
-      setVideos(dbVideos);
+      setVideos(dbVideos as Video[]);
       if (dbVideos.length === 0) {
         setError('No videos found');
       }
@@ -110,8 +108,9 @@ const Videos: React.FC<VideosProps> = ({ onLogoutClick, onNavigate }) => {
     }
   };
 
-  const handleDeleteClick = (id: string, name: string) => {
-    setDeleteConfirm({ show: true, id, name });
+  const handleDeleteClick = (id: string | number | undefined, name: string | undefined) => {
+    if (!id || !name) return;
+    setDeleteConfirm({ show: true, id: String(id), name });
     setDeleteMessage('');
   };
 
@@ -297,7 +296,7 @@ const Videos: React.FC<VideosProps> = ({ onLogoutClick, onNavigate }) => {
                   </button>
                   {/* Delete button */}
                   <button
-                    onClick={() => handleDeleteClick(vid.id, vid.name)}
+                    onClick={() => vid.id && handleDeleteClick(vid.id, vid.name)}
                     className="absolute top-0 right-0 bg-red-500/80 hover:bg-red-600 text-white p-1 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                     title="Delete video"
                   >

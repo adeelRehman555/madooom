@@ -52,8 +52,8 @@ const App: React.FC = () => {
     });
   };
 
-  const handleNavigate = (page: AuthStep) => {
-    setAuth((prev) => ({ ...prev, step: page }));
+  const handleNavigate = (page: string) => {
+    setAuth((prev) => ({ ...prev, step: page as AuthStep }));
   };
 
   if (isLoading) {
