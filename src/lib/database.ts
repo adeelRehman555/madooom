@@ -1,5 +1,6 @@
 // Database utility functions for Neon via Backend API
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '' : 'http://localhost:5000/api');
 
 export interface MediaItem {
   id?: number;

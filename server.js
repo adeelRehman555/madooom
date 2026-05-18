@@ -6,10 +6,10 @@ import { v2 as cloudinary } from 'cloudinary';
 import multer from 'multer';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.local' });
+// Load environment variables
+dotenv.config();
 
 const app = express();
-const port = 5000;
 
 // Configure Cloudinary SDK
 cloudinary.config({
@@ -19,21 +19,40 @@ cloudinary.config({
 });
 
 // Enable CORS for frontend requests
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins for testing
+  credentials: true
+}));
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } });
+const upload = multer({ 
+  storage: multer.memoryStorage(), 
+  limits: { fileSize: 100 * 1024 * 1024 } 
+});
 
 // Create connection pool to Neon
-const pool = new Pool({
-  connectionString: process.env.VITE_DATABASE_URL,
-  ssl: true,
-});
+let pool;
+try {
+  pool = new Pool({
+    connectionString: process.env.VITE_DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false // Required for some Neon connections
+    },
+  });
+  console.log('✅ Database connection pool created');
+} catch (error) {
+  console.error('❌ Error creating database pool:', error);
+}
 
 // Initialize database - create tables if they don't exist
 const initializeDatabase = async () => {
   try {
+    if (!pool) {
+      console.error('❌ Database pool not initialized');
+      return;
+    }
+    
     await pool.query(`
       CREATE TABLE IF NOT EXISTS media (
         id SERIAL PRIMARY KEY,
@@ -44,6 +63,8 @@ const initializeDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    console.log('✅ Media table initialized');
+    
     await pool.query(`
       CREATE TABLE IF NOT EXISTS wishlist (
         id SERIAL PRIMARY KEY,
@@ -55,11 +76,14 @@ const initializeDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log('✅ Media table initialized');
+    console.log('✅ Wishlist table initialized');
   } catch (error) {
     console.error('❌ Error initializing database:', error);
   }
 };
+
+// Call initialization
+initializeDatabase();
 
 // Fetch resources from Cloudinary
 const fetchCloudinaryMedia = async (resourceType) => {
@@ -96,7 +120,7 @@ const fetchCloudinaryMedia = async (resourceType) => {
   }
 };
 
-// Filter images and videos
+// Filter images and videos by format
 const filterByFormat = (resources, formats) => {
   return resources.filter((resource) =>
     formats.includes(resource.format?.toLowerCase())
@@ -115,6 +139,10 @@ const mapToMediaItem = (resource, type) => ({
 // API endpoint: Fetch and save media from Cloudinary to database
 app.post('/api/sync-media', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     // Fetch images and videos from Cloudinary
     const [allImages, allVideos] = await Promise.all([
       fetchCloudinaryMedia('image'),
@@ -144,6 +172,7 @@ app.post('/api/sync-media', async (req, res) => {
         insertedCount++;
       } catch (err) {
         // Ignore duplicates
+        console.log('Duplicate media skipped:', media.public_id);
       }
     }
 
@@ -165,6 +194,10 @@ app.post('/api/sync-media', async (req, res) => {
 // API endpoint: Get media by type
 app.get('/api/media/:type', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const { type } = req.params;
 
     if (!['image', 'video'].includes(type)) {
@@ -187,9 +220,35 @@ app.get('/api/media/:type', async (req, res) => {
   }
 });
 
+// API endpoint: Get all media
+app.get('/api/media', async (req, res) => {
+  try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
+    const result = await pool.query(
+      'SELECT id, public_id, url, type, name, created_at FROM media ORDER BY created_at DESC;'
+    );
+
+    res.json({
+      success: true,
+      data: result.rows,
+      count: result.rows.length,
+    });
+  } catch (error) {
+    console.error('❌ Error fetching media:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // API endpoint: Get wishlist
 app.get('/api/wishlist', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const result = await pool.query(
       'SELECT id, title, description, link, priority, completed, created_at FROM wishlist ORDER BY created_at DESC;'
     );
@@ -203,6 +262,10 @@ app.get('/api/wishlist', async (req, res) => {
 // API endpoint: Add wishlist item
 app.post('/api/wishlist', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const { title, description, link, priority } = req.body;
     if (!title) return res.status(400).json({ error: 'Title is required' });
 
@@ -222,6 +285,10 @@ app.post('/api/wishlist', async (req, res) => {
 // API endpoint: Update wishlist item
 app.put('/api/wishlist/:id', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const { id } = req.params;
     const { title, description, link, priority, completed } = req.body;
     const result = await pool.query(
@@ -237,21 +304,13 @@ app.put('/api/wishlist/:id', async (req, res) => {
   }
 });
 
-// API endpoint: Delete wishlist item
-app.delete('/api/wishlist/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('DELETE FROM wishlist WHERE id=$1 RETURNING id;', [id]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Item not found' });
-    res.json({ success: true, message: 'Item deleted' });
-  } catch (error) {
-    console.error('❌ Error deleting wishlist item:', error);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
+// API endpoint: Toggle wishlist item completion
 app.patch('/api/wishlist/:id/toggle', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const { id } = req.params;
     const { completed } = req.body;
     
@@ -271,20 +330,19 @@ app.patch('/api/wishlist/:id/toggle', async (req, res) => {
   }
 });
 
-// API endpoint: Get all media
-app.get('/api/media', async (req, res) => {
+// API endpoint: Delete wishlist item
+app.delete('/api/wishlist/:id', async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, public_id, url, type, name, created_at FROM media ORDER BY created_at DESC;'
-    );
-
-    res.json({
-      success: true,
-      data: result.rows,
-      count: result.rows.length,
-    });
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
+    const { id } = req.params;
+    const result = await pool.query('DELETE FROM wishlist WHERE id=$1 RETURNING id;', [id]);
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Item not found' });
+    res.json({ success: true, message: 'Item deleted' });
   } catch (error) {
-    console.error('❌ Error fetching media:', error);
+    console.error('❌ Error deleting wishlist item:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -327,7 +385,7 @@ const uploadToCloudinary = async (fileBuffer, fileName, resourceType, mimeType) 
   }
 };
 
-// Helper: Delete file from Cloudinary using SDK
+// Helper: Delete file from Cloudinary
 const deleteFromCloudinary = async (publicId, resourceType) => {
   try {
     return await new Promise((resolve, reject) => {
@@ -340,7 +398,7 @@ const deleteFromCloudinary = async (publicId, resourceType) => {
       });
     });
   } catch (error) {
-    console.error('❌ Error deleting from Cloudinary (SDK):', error);
+    console.error('❌ Error deleting from Cloudinary:', error);
     throw error;
   }
 };
@@ -348,6 +406,10 @@ const deleteFromCloudinary = async (publicId, resourceType) => {
 // API endpoint: Upload file to Cloudinary and save to database
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     if (!req.file || !req.body.type) {
       return res.status(400).json({ error: 'Invalid request: file and type are required' });
     }
@@ -398,6 +460,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 // API endpoint: Delete media from database and Cloudinary
 app.delete('/api/media/:id', async (req, res) => {
   try {
+    if (!pool) {
+      return res.status(500).json({ success: false, error: 'Database not connected' });
+    }
+    
     const { id } = req.params;
 
     // Get media from database
@@ -436,13 +502,29 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+  res.json({ 
+    status: 'Server is running', 
+    database: pool ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString() 
+  });
 });
 
-// Start server
-app.listen(port, async () => {
-  console.log(`🚀 Server running on http://localhost:${port}`);
-  await initializeDatabase();
+// Root endpoint for testing
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Nibi API Server is running',
+    endpoints: [
+      '/api/health',
+      '/api/media',
+      '/api/media/:type',
+      '/api/wishlist',
+      '/api/sync-media',
+      '/api/upload'
+    ]
+  });
 });
+
+// Export for Vercel serverless function
+export default app;
