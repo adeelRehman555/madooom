@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "start": "node server.js"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "cloudinary": "^2.10.0",
