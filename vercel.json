@@ -1,12 +1,5 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": "vite",
-  "functions": {
-    "api/index.js": {
-      "memory": 1024,
-      "maxDuration": 60,
-      "runtime": "nodejs@20"
-    }
-  }
+  "framework": "vite"
 }
