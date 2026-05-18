@@ -1,0 +1,97 @@
+.fireworks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.firework {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  opacity: 1;
+  animation: launch 2s ease-out forwards;
+}
+
+.firework::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: explode 1.5s ease-out forwards;
+  animation-delay: 2s; /* Should match launch animation duration */
+  box-shadow: 
+    0 0 15px 5px rgba(255, 255, 255, 0.8),
+    0 0 30px 10px rgba(255, 223, 186, 0.6),
+    0 0 50px 20px rgba(255, 105, 180, 0.4);
+}
+
+@keyframes launch {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-80vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(25);
+    opacity: 0;
+  }
+}
+
+/* More fireworks with varied positions and delays */
+.firework:nth-child(1) { left: 15%; top: 90%; animation-delay: 0s; background-color: #ffadad; }
+.firework:nth-child(1)::before { animation-delay: 2s; }
+
+.firework:nth-child(2) { left: 85%; top: 80%; animation-delay: 0.2s; background-color: #ffd6a5; }
+.firework:nth-child(2)::before { animation-delay: 2.2s; }
+
+.firework:nth-child(3) { left: 50%; top: 95%; animation-delay: 0.4s; background-color: #fdffb6; }
+.firework:nth-child(3)::before { animation-delay: 2.4s; }
+
+.firework:nth-child(4) { left: 30%; top: 85%; animation-delay: 0.6s; background-color: #caffbf; }
+.firework:nth-child(4)::before { animation-delay: 2.6s; }
+
+.firework:nth-child(5) { left: 70%; top: 75%; animation-delay: 0.8s; background-color: #9bf6ff; }
+.firework:nth-child(5)::before { animation-delay: 2.8s; }
+
+.firework:nth-child(6) { left: 10%; top: 70%; animation-delay: 1s; background-color: #a0c4ff; }
+.firework:nth-child(6)::before { animation-delay: 3s; }
+
+.firework:nth-child(7) { left: 90%; top: 65%; animation-delay: 1.2s; background-color: #bdb2ff; }
+.firework:nth-child(7)::before { animation-delay: 3.2s; }
+
+.firework:nth-child(8) { left: 40%; top: 80%; animation-delay: 1.4s; background-color: #ffc6ff; }
+.firework:nth-child(8)::before { animation-delay: 3.4s; }
+
+.firework:nth-child(9) { left: 60%; top: 88%; animation-delay: 1.6s; background-color: #fffffc; }
+.firework:nth-child(9)::before { animation-delay: 3.6s; }
+
+.firework:nth-child(10) { left: 25%; top: 75%; animation-delay: 1.8s; background-color: #ff8fab; }
+.firework:nth-child(10)::before { animation-delay: 3.8s; }
+
+.firework:nth-child(11) { left: 75%; top: 85%; animation-delay: 2.0s; background-color: #f8b195; }
+.firework:nth-child(11)::before { animation-delay: 4.0s; }
+
+.firework:nth-child(12) { left: 55%; top: 60%; animation-delay: 2.2s; background-color: #f67280; }
+.firework:nth-child(12)::before { animation-delay: 4.2s; }
+
+  
