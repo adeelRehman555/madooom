@@ -1,0 +1,19 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev:all",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "env": [
+    "VITE_CLOUDINARY_CLOUD_NAME",
+    "VITE_CLOUDINARY_API_KEY",
+    "VITE_CLOUDINARY_API_SECRET",
+    "VITE_DATABASE_URL",
+    "VITE_API_URL"
+  ],
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}
