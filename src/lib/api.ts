@@ -1,5 +1,14 @@
 // API configuration for frontend
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getApiUrl = () => {
+  // In development, use local server
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000/api';
+  }
+  // In production, use same domain (Vercel will route /api to the serverless function)
+  return '/api';
+};
+
+export const API_URL = import.meta.env.VITE_API_URL || getApiUrl();
 
 export const apiClient = {
   async get(endpoint: string) {
