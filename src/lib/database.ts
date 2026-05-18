@@ -1,6 +1,4 @@
 // Database utility functions for Neon via Backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? '' : 'http://localhost:5000/api');
 
 export interface MediaItem {
   id?: number;
@@ -10,6 +8,28 @@ export interface MediaItem {
   public_id: string;
   created_at: string;
 }
+
+export interface WishlistItem {
+  id: number;
+  title: string;
+  description: string;
+  link?: string;
+  priority: 'high' | 'medium' | 'low';
+  completed: boolean;
+  created_at: string;
+}
+
+// Dynamically set API base URL for production and development
+const getApiBaseUrl = () => {
+  // For production (Vercel), use relative path
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return '/api';
+  }
+  // For local development
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Initialize database tables
 export const initializeDatabase = async () => {
@@ -81,19 +101,6 @@ export const getAllMedia = async (): Promise<MediaItem[]> => {
   }
 };
 
-// Save media to database (legacy - for backwards compatibility)
-export const saveMediaToDatabase = async (media: MediaItem[]): Promise<boolean> => {
-  try {
-    console.log(`Saving ${media.length} media items to database...`);
-    // This function is now handled by the sync-media endpoint
-    // Kept for backwards compatibility
-    return true;
-  } catch (error) {
-    console.error('Error saving media:', error);
-    return false;
-  }
-};
-
 // Upload media file to Cloudinary and save to database
 export const uploadMediaFile = async (file: File, type: 'image' | 'video'): Promise<MediaItem | null> => {
   try {
@@ -161,15 +168,7 @@ export const deleteMediaById = async (id: number): Promise<boolean> => {
   }
 };
 
-export interface WishlistItem {
-  id: number;
-  title: string;
-  description: string;
-  link?: string;
-  priority: 'high' | 'medium' | 'low';
-  completed: boolean;
-  created_at: string;
-}
+// ============= WISHLIST API FUNCTIONS =============
 
 // Get all wishlist items
 export const getWishlistItems = async (): Promise<WishlistItem[]> => {
