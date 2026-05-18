@@ -6,7 +6,7 @@
     "api/index.js": {
       "memory": 1024,
       "maxDuration": 60,
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs@20"
     }
   }
 }
