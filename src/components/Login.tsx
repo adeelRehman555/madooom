@@ -13,18 +13,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
-  const [countdownSeconds, setCountdownSeconds] = useState(300); // 5 minutes for testing
-  const [countdownActive, setCountdownActive] = useState(true);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check if countdown is still active
-    if (countdownActive && countdownSeconds > 0) {
-      setError('⏰ Wait for the countdown to finish! Your gift is on the way! 🎁');
-      setIsShaking(true);
-      return;
-    }
 
     setError('');
     setLoading(true);
@@ -65,28 +56,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       return () => clearTimeout(timer);
     }
   }, [isShaking]);
-
-  // Countdown timer effect
-  useEffect(() => {
-    if (!countdownActive || countdownSeconds <= 0) {
-      if (countdownSeconds <= 0) {
-        setCountdownActive(false);
-      }
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setCountdownSeconds((prev) => {
-        if (prev <= 1) {
-          setCountdownActive(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [countdownActive, countdownSeconds]);
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-pink-200 via-rose-100 to-purple-200 font-sans">
@@ -162,31 +131,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </p>
           </div>
 
-          {/* Countdown Timer */}
-          {countdownActive && countdownSeconds > 0 && (
-            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-pink-100 via-rose-100 to-pink-100 border-2 border-pink-300 shadow-lg animate-pulse">
-              <div className="text-center">
-                <p className="text-sm md:text-base font-semibold text-rose-600 mb-3">⏰ Your Gift is On The Way! ⏰</p>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                    {String(Math.floor(countdownSeconds / 60)).padStart(2, '0')}:{String(countdownSeconds % 60).padStart(2, '0')}
-                  </span>
-                </div>
-                <p className="text-xs md:text-sm text-rose-500 mt-3 font-medium">⏳ Wait for the magic moment... 🎁</p>
-              </div>
-            </div>
-          )}
-
-          {/* Countdown Complete Message */}
-          {!countdownActive && countdownSeconds === 0 && (
-            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-green-100 via-emerald-100 to-green-100 border-2 border-green-400 shadow-lg animate-bounce-slow">
-              <div className="text-center">
-                <p className="text-lg md:text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">🎉 It's Time! The Gift is Ready! 🎉</p>
-                <p className="text-sm text-green-600 mt-2">✨ Open your surprise now! ✨</p>
-              </div>
-            </div>
-          )}
-
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Nickname Input */}
@@ -202,7 +146,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                   onChange={(e) => setNickname(e.target.value)}
                   placeholder="Enter your nickname..."
                   className="w-full px-5 py-3.5 pr-12 border-2 border-pink-200 rounded-2xl text-sm transition-all duration-300 bg-white/80 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white focus:shadow-lg focus:shadow-pink-200/50 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                  disabled={loading || (countdownActive && countdownSeconds > 0)}
+                  disabled={loading}
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none transition-transform group-focus-within:scale-110">💕</span>
               </div>
@@ -223,7 +167,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                     showYearDropdown
                     dropdownMode="select"
                     className="w-full px-5 py-3.5 pr-12 border-2 border-pink-200 rounded-2xl text-sm transition-all duration-300 bg-white/80 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white focus:shadow-lg focus:shadow-pink-200/50 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
-                    disabled={loading || (countdownActive && countdownSeconds > 0)}
+                    disabled={loading}
                     placeholderText="🌸 When were you born? 🌸"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none transition-transform group-focus-within:scale-110">🎈</span>
@@ -242,17 +186,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             <button
               type="submit"
               className="w-full py-3.5 px-6 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-pink-400/40 hover:scale-105 active:scale-98 disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6 group"
-              disabled={loading || (countdownActive && countdownSeconds > 0)}
+              disabled={loading}
             >
               {loading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                   <span>Checking your birthday...</span>
-                </>
-              ) : countdownActive && countdownSeconds > 0 ? (
-                <>
-                  <span className="text-lg">⏳</span>
-                  <span>Wait for the countdown...</span>
                 </>
               ) : (
                 <>
