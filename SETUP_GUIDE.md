@@ -1,4 +1,4 @@
-# Nibi Birthday App - Full-Stack Setup Guide
+# Cutie Birthday App - Full-Stack Setup Guide
 
 ## ✅ What's Done
 
