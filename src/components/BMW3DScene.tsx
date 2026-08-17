@@ -492,7 +492,7 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
     return () => clearInterval(interval);
   }, [isBoosting]);
 
-  // 1. Synthesizes Color Change Chime Sound
+  // 1. Pleasant Sci-Fi Paint Swap Chime
   const playColorChangeSound = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -502,10 +502,10 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(520, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1040, ctx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(360, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(720, ctx.currentTime + 0.12);
 
-      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
 
       osc.connect(gain);
@@ -516,79 +516,96 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
     } catch (e) {}
   };
 
-  // 2. Synthesizes Turbo Nitro Boost Roar Sound
+  // 2. Realistic Deep Turbo Nitro Roar
   const playNitroBoostSound = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
 
-      // Turbo Spool Whine
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(300, ctx.currentTime);
-      osc1.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.5);
+      // Deep Sub-Bass Exhaust Roar with Low-Pass Filter
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
 
-      gain1.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(65, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(140, ctx.currentTime + 0.4);
 
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(280, ctx.currentTime); // Warm cutoff filter removes harsh pitch
 
-      // Exhaust Flame Roar
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = 'sawtooth';
-      osc2.frequency.setValueAtTime(140, ctx.currentTime);
-      osc2.frequency.exponentialRampToValueAtTime(340, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
 
-      gain2.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
 
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-
-      osc1.start();
-      osc2.start();
-      osc1.stop(ctx.currentTime + 0.55);
-      osc2.stop(ctx.currentTime + 0.55);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.55);
     } catch (e) {}
   };
 
-  // 3. Continuous Sports Engine Motor Sound Loop
+  // 3. Deep Rumbling V8 Engine Continuous Sound
   useEffect(() => {
     let ctx: AudioContext | null = null;
-    let osc: OscillatorNode | null = null;
-    let gain: GainNode | null = null;
+    let osc1: OscillatorNode | null = null;
+    let osc2: OscillatorNode | null = null;
 
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
         ctx = new AudioCtx();
-        osc = ctx.createOscillator();
-        gain = ctx.createGain();
 
-        osc.type = 'sawtooth';
-        // Base engine idling/cruising frequency (higher pitch when nitro is active)
-        const freq = isBoosting ? 220 : 95;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        // Deep V8 Sub Engine Oscillator 1
+        osc1 = ctx.createOscillator();
+        const filter1 = ctx.createBiquadFilter();
+        const gain1 = ctx.createGain();
 
-        gain.gain.setValueAtTime(isBoosting ? 0.12 : 0.05, ctx.currentTime);
+        osc1.type = 'sawtooth';
+        const baseFreq = isBoosting ? 110 : 48; // Deep V8 Sub-rumble
+        osc1.frequency.setValueAtTime(baseFreq, ctx.currentTime);
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
+        filter1.type = 'lowpass';
+        filter1.frequency.setValueAtTime(isBoosting ? 320 : 180, ctx.currentTime); // Warm lowpass filter to remove pitchiness
+
+        gain1.gain.setValueAtTime(isBoosting ? 0.08 : 0.035, ctx.currentTime);
+
+        osc1.connect(filter1);
+        filter1.connect(gain1);
+        gain1.connect(ctx.destination);
+
+        // Deep V8 Sub Oscillator 2 (Sub-harmonic frequency)
+        osc2 = ctx.createOscillator();
+        const filter2 = ctx.createBiquadFilter();
+        const gain2 = ctx.createGain();
+
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(baseFreq * 0.75, ctx.currentTime);
+
+        filter2.type = 'lowpass';
+        filter2.frequency.setValueAtTime(150, ctx.currentTime);
+
+        gain2.gain.setValueAtTime(isBoosting ? 0.07 : 0.03, ctx.currentTime);
+
+        osc2.connect(filter2);
+        filter2.connect(gain2);
+        gain2.connect(ctx.destination);
+
+        osc1.start();
+        osc2.start();
       }
     } catch (e) {}
 
     return () => {
-      if (osc) osc.stop();
+      if (osc1) osc1.stop();
+      if (osc2) osc2.stop();
       if (ctx) ctx.close();
     };
   }, [isBoosting]);
 
-  // Synthesizes authentic BMW sports car dual-tone car horn sound using Web Audio API
+  // 4. Authentic BMW Dual-Tone Warm Horn Sound
   const playBMWHornSound = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -596,35 +613,37 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
 
       const audioCtx = new AudioCtx();
 
-      // Dual-tone BMW horn frequencies (~435Hz & ~365Hz with harmonics)
+      // Warm European Dual-Tone Horn (310Hz & 250Hz with lowpass smoothing)
       const osc1 = audioCtx.createOscillator();
       const osc2 = audioCtx.createOscillator();
+      const filter = audioCtx.createBiquadFilter();
       const gainNode = audioCtx.createGain();
 
-      osc1.type = 'sawtooth';
+      osc1.type = 'triangle';
       osc2.type = 'sawtooth';
 
-      osc1.frequency.setValueAtTime(435, audioCtx.currentTime); // High Freq
-      osc2.frequency.setValueAtTime(365, audioCtx.currentTime); // Low Freq
+      osc1.frequency.setValueAtTime(310, audioCtx.currentTime); // Freq 1 (Eb4)
+      osc2.frequency.setValueAtTime(250, audioCtx.currentTime); // Freq 2 (B3)
 
-      // Envelope: fast attack, steady sustain, clean decay
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(550, audioCtx.currentTime); // Warm lowpass filter
+
       gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.04);
-      gainNode.gain.setValueAtTime(0.35, audioCtx.currentTime + 0.55);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.75);
+      gainNode.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.05);
+      gainNode.gain.setValueAtTime(0.22, audioCtx.currentTime + 0.5);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
 
-      osc1.connect(gainNode);
-      osc2.connect(gainNode);
+      osc1.connect(filter);
+      osc2.connect(filter);
+      filter.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
       osc1.start();
       osc2.start();
 
-      osc1.stop(audioCtx.currentTime + 0.78);
-      osc2.stop(audioCtx.currentTime + 0.78);
-    } catch (err) {
-      console.error('Audio play error:', err);
-    }
+      osc1.stop(audioCtx.currentTime + 0.72);
+      osc2.stop(audioCtx.currentTime + 0.72);
+    } catch (err) {}
   };
 
   const handleHonk = () => {
