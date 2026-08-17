@@ -108,10 +108,10 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
     setIsSubmitting(true);
 
     // Create email content
-    const emailSubject = encodeURIComponent(`🎀 Birthday Gift Review from ${credentials?.nickname || 'Aniba'} 🎀`);
+    const emailSubject = encodeURIComponent(`🎀 Birthday Gift Review from ${credentials?.nickname || 'Cutie'} 🎀`);
     const emailBody = encodeURIComponent(
       `Dear Ajadeel,\n\n` +
-      `Here is the review for the birthday gift from ${credentials?.nickname || 'Aniba'}:\n\n` +
+      `Here is the review for the birthday gift from ${credentials?.nickname || 'Cutie'}:\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `📋 GIFT REVIEW FORM\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -128,7 +128,7 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `✨ Thank you for your honest feedback! ✨\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `💝 Love you Nibi! Keep shining bright! 💝\n` +
+      `💝 Love you Cutie! Keep shining bright! 💝\n` +
       `📅 Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\n` +
       `⏰ Time: ${new Date().toLocaleTimeString()}\n`
     );
@@ -213,7 +213,7 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
               </div>
 
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 bg-clip-text text-transparent mb-2 md:mb-3 animate-gradient-x">
-                Happy Birthday, {credentials?.nickname || 'Nibi'}!
+                Happy Birthday, {credentials?.nickname || 'Cutie'}!
               </h1>
               <p className="text-rose-400 text-base md:text-xl font-semibold">
                 May this be the best day for you, filled with love and joy! 💝

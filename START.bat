@@ -1,7 +1,7 @@
 @echo off
-REM Quick Start Script for Nibi Birthday App
+REM Quick Start Script for Cutie Birthday App
 echo.
-echo 🎂 Starting Nibi Birthday App...
+echo 🎂 Starting Cutie Birthday App...
 echo.
 
 REM Check if node_modules exists

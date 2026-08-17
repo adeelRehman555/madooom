@@ -7,7 +7,7 @@ export interface AuthData {
   timestamp: number;
 }
 
-const AUTH_TOKEN_KEY = 'nibi_auth';
+const AUTH_TOKEN_KEY = 'cutie_auth';
 
 export const storeAuthToken = (nickname: string, dob: string): void => {
   const authData: AuthData = {
