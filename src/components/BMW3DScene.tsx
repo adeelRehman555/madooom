@@ -202,8 +202,8 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
         }
       }
 
-      // 5. Render 3D BMW Sports Car
-      const carScale = Math.min(width / 420, 1.2);
+      // 5. Render Hyper-Realistic 3D BMW Sports Car
+      const carScale = Math.min(width / 400, 1.25);
       const carX = width / 2;
       const carY = height * 0.72;
 
@@ -211,174 +211,244 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
       ctx.translate(carX, carY);
       ctx.scale(carScale, carScale);
 
-      // Car Vibration Effect
-      const vibration = (Math.random() - 0.5) * (isNitro ? 3 : 1);
-      ctx.translate(vibration, vibration);
+      // Car Engine Vibration & Nitro Shake
+      const vibrationX = (Math.random() - 0.5) * (isNitro ? 4 : 1.2);
+      const vibrationY = (Math.random() - 0.5) * (isNitro ? 4 : 1.2);
+      ctx.translate(vibrationX, vibrationY);
 
-      // Underglow Neon Shadow
+      // Underglow Neon Shadow (Dual Layer for Realistic Ground Illumination)
       ctx.save();
-      ctx.shadowBlur = isNitro ? 35 : 25;
+      ctx.shadowBlur = isNitro ? 45 : 30;
       ctx.shadowColor = isNitro ? '#f43f5e' : colorRef.current.accent;
-      ctx.fillStyle = isNitro ? 'rgba(244, 63, 94, 0.5)' : 'rgba(0, 163, 224, 0.4)';
+      ctx.fillStyle = isNitro ? 'rgba(244, 63, 94, 0.65)' : 'rgba(0, 163, 224, 0.45)';
       ctx.beginPath();
-      ctx.ellipse(0, 45, 150, 35, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 48, 160, 38, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // Exhaust Flames (Nitro Trail)
+      // Exhaust Nitro Flames & Thruster Particle Sparkles
       if (isNitro) {
         ctx.save();
-        ctx.fillStyle = '#ff4d4d';
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 25;
         ctx.shadowColor = '#ff2200';
 
-        // Left Flame
-        ctx.beginPath();
-        ctx.moveTo(-60, 40);
-        ctx.lineTo(-68, 40 + Math.random() * 35 + 20);
-        ctx.lineTo(-52, 40);
-        ctx.fill();
+        // Dual Quad Exhaust Flame Jets
+        [-62, -48, 48, 62].forEach((xPos) => {
+          const flameLength = Math.random() * 45 + 30;
+          const flameGrad = ctx.createLinearGradient(xPos, 38, xPos, 38 + flameLength);
+          flameGrad.addColorStop(0, '#ffffff');
+          flameGrad.addColorStop(0.3, '#ffcc00');
+          flameGrad.addColorStop(0.7, '#ff3300');
+          flameGrad.addColorStop(1, 'rgba(255, 0, 0, 0)');
 
-        // Right Flame
-        ctx.beginPath();
-        ctx.moveTo(52, 40);
-        ctx.lineTo(68, 40 + Math.random() * 35 + 20);
-        ctx.lineTo(60, 40);
-        ctx.fill();
-
+          ctx.fillStyle = flameGrad;
+          ctx.beginPath();
+          ctx.moveTo(xPos - 6, 38);
+          ctx.lineTo(xPos, 38 + flameLength);
+          ctx.lineTo(xPos + 6, 38);
+          ctx.closePath();
+          ctx.fill();
+        });
         ctx.restore();
       }
 
-      // Car Rear / Roof Structure
-      // Main Body Base
-      const bodyGradient = ctx.createLinearGradient(-120, -50, 120, 50);
+      // Wheels & Rim Rotors (Rendered behind body)
+      ctx.save();
+      // Left Rear Wheel
+      ctx.fillStyle = '#090d16';
+      ctx.beginPath();
+      ctx.roundRect(-144, 8, 18, 36, 4);
+      ctx.fill();
+      // Disc Brake & Red Caliper (Left)
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(-140, 14, 4, 24);
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(-140, 10, 5, 8);
+
+      // Right Rear Wheel
+      ctx.fillStyle = '#090d16';
+      ctx.beginPath();
+      ctx.roundRect(126, 8, 18, 36, 4);
+      ctx.fill();
+      // Disc Brake & Red Caliper (Right)
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(136, 14, 4, 24);
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(135, 10, 5, 8);
+      ctx.restore();
+
+      // Main Coupe Body Silhouette (Multi-layer Metallic Gradient)
+      const bodyGradient = ctx.createLinearGradient(-130, -60, 130, 60);
       bodyGradient.addColorStop(0, colorRef.current.hex);
-      bodyGradient.addColorStop(0.5, colorRef.current.hex);
+      bodyGradient.addColorStop(0.4, colorRef.current.hex);
+      bodyGradient.addColorStop(0.85, '#1e293b');
       bodyGradient.addColorStop(1, '#0f172a');
 
       ctx.fillStyle = bodyGradient;
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 2.5;
 
-      // Lower Body Silhouette
+      // Lower Body Contour
       ctx.beginPath();
-      ctx.moveTo(-130, 20);
-      ctx.quadraticCurveTo(-140, -10, -110, -30);
-      ctx.quadraticCurveTo(-80, -45, -50, -55);
-      ctx.lineTo(50, -55);
-      ctx.quadraticCurveTo(80, -45, 110, -30);
-      ctx.quadraticCurveTo(140, -10, 130, 20);
-      ctx.quadraticCurveTo(120, 45, -120, 45);
+      ctx.moveTo(-135, 20);
+      ctx.quadraticCurveTo(-145, -12, -115, -34);
+      ctx.quadraticCurveTo(-85, -50, -52, -60);
+      ctx.lineTo(52, -60);
+      ctx.quadraticCurveTo(85, -50, 115, -34);
+      ctx.quadraticCurveTo(145, -12, 135, 20);
+      ctx.quadraticCurveTo(125, 48, -125, 48);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
-      // Cabin / Roof (Upper Coupe Curve)
-      const roofGradient = ctx.createLinearGradient(-70, -90, 70, -55);
-      roofGradient.addColorStop(0, '#1e293b');
-      roofGradient.addColorStop(0.5, '#334155');
-      roofGradient.addColorStop(1, '#0f172a');
+      // Metallic Body Highlight Curve
+      ctx.save();
+      const highlightGrad = ctx.createLinearGradient(-120, -20, 120, -20);
+      highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+      highlightGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+      highlightGrad.addColorStop(1, 'rgba(255, 255, 255, 0.45)');
+      ctx.strokeStyle = highlightGrad;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-125, -5);
+      ctx.quadraticCurveTo(0, -25, 125, -5);
+      ctx.stroke();
+      ctx.restore();
+
+      // Cabin / Carbon Fiber Roof
+      const roofGradient = ctx.createLinearGradient(-75, -95, 75, -60);
+      roofGradient.addColorStop(0, '#0f172a');
+      roofGradient.addColorStop(0.5, '#1e293b');
+      roofGradient.addColorStop(1, '#090d16');
 
       ctx.fillStyle = roofGradient;
       ctx.beginPath();
-      ctx.moveTo(-70, -55);
-      ctx.quadraticCurveTo(-50, -95, 0, -98);
-      ctx.quadraticCurveTo(50, -95, 70, -55);
+      ctx.moveTo(-72, -58);
+      ctx.quadraticCurveTo(-52, -98, 0, -102);
+      ctx.quadraticCurveTo(52, -98, 72, -58);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
 
-      // Rear Windshield Glass
-      const glassGradient = ctx.createLinearGradient(-60, -85, 60, -60);
-      glassGradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
-      glassGradient.addColorStop(1, 'rgba(15, 23, 42, 0.9)');
+      // Rear Windshield Glass with 3D Sunburst Reflections
+      const glassGradient = ctx.createLinearGradient(-62, -90, 62, -60);
+      glassGradient.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+      glassGradient.addColorStop(0.5, 'rgba(30, 41, 59, 0.85)');
+      glassGradient.addColorStop(1, 'rgba(15, 23, 42, 0.95)');
+
       ctx.fillStyle = glassGradient;
       ctx.beginPath();
-      ctx.moveTo(-60, -58);
-      ctx.quadraticCurveTo(-45, -88, 0, -90);
-      ctx.quadraticCurveTo(45, -88, 60, -58);
+      ctx.moveTo(-62, -60);
+      ctx.quadraticCurveTo(-46, -92, 0, -95);
+      ctx.quadraticCurveTo(46, -92, 62, -60);
       ctx.closePath();
       ctx.fill();
 
-      // Rear Spoiler (M-Performance Wing)
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(-110, -40, 220, 8);
-      ctx.fillRect(-105, -35, 12, 10);
-      ctx.fillRect(93, -35, 12, 10);
+      // Glass Light Reflection Streak
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.moveTo(-35, -88);
+      ctx.lineTo(-10, -88);
+      ctx.lineTo(-45, -64);
+      ctx.lineTo(-55, -64);
+      ctx.closePath();
+      ctx.fill();
 
-      // BMW Signature Tail Lights (L-shape LED Tail Lamps)
+      // Carbon Fiber M-Performance Rear Wing Spoiler
       ctx.save();
-      ctx.shadowBlur = 20;
+      ctx.fillStyle = '#090d16';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#000000';
+      ctx.fillRect(-115, -44, 230, 9);
+      // Wing Supports
+      ctx.fillRect(-105, -38, 14, 12);
+      ctx.fillRect(91, -38, 14, 12);
+      ctx.restore();
+
+      // BMW Signature OLED L-Shaped Tail Lamps
+      ctx.save();
+      ctx.shadowBlur = 24;
       ctx.shadowColor = '#f43f5e';
       ctx.fillStyle = '#ff1744';
 
-      // Left Tail Lamp
+      // Left OLED Tail Lamp
       ctx.beginPath();
-      ctx.moveTo(-125, -5);
-      ctx.lineTo(-75, -5);
-      ctx.lineTo(-70, 10);
-      ctx.lineTo(-120, 10);
+      ctx.moveTo(-128, -8);
+      ctx.lineTo(-72, -8);
+      ctx.lineTo(-68, 8);
+      ctx.lineTo(-122, 8);
       ctx.closePath();
       ctx.fill();
 
-      // Right Tail Lamp
+      // Inner LED Strip (Left)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-122, -4, 45, 3);
+
+      // Right OLED Tail Lamp
+      ctx.fillStyle = '#ff1744';
       ctx.beginPath();
-      ctx.moveTo(75, -5);
-      ctx.lineTo(125, -5);
-      ctx.lineTo(120, 10);
-      ctx.lineTo(70, 10);
+      ctx.moveTo(72, -8);
+      ctx.lineTo(128, -8);
+      ctx.lineTo(122, 8);
+      ctx.lineTo(68, 8);
       ctx.closePath();
       ctx.fill();
+
+      // Inner LED Strip (Right)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(77, -4, 45, 3);
       ctx.restore();
 
-      // BMW Kidney Grille & Logo Accent on Trunk
-      // BMW Roundel Emblem
+      // BMW Roundel Emblem on Trunk
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(0, 0, 12, 0, Math.PI * 2);
+      ctx.arc(0, -4, 13, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
       ctx.lineWidth = 1.5;
       ctx.strokeStyle = '#000000';
       ctx.stroke();
 
-      // Emblem Segments (Blue & White quadrants)
+      // Emblem Blue Quadrants
       ctx.fillStyle = '#0055b8';
       ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 11, 0, Math.PI / 2);
+      ctx.moveTo(0, -4);
+      ctx.arc(0, -4, 12, 0, Math.PI / 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 11, Math.PI, (Math.PI * 3) / 2);
+      ctx.moveTo(0, -4);
+      ctx.arc(0, -4, 12, Math.PI, (Math.PI * 3) / 2);
       ctx.fill();
+      ctx.restore();
 
       // M-Power License Plate
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(-35, 15, 70, 18);
-      ctx.strokeStyle = '#000000';
-      ctx.strokeRect(-35, 15, 70, 18);
+      ctx.fillRect(-38, 14, 76, 20);
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-38, 14, 76, 20);
 
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 11px sans-serif';
+      ctx.fillStyle = '#090d16';
+      ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('BMW • AQSA', 0, 28);
 
-      // Dual Exhaust Pipes
-      ctx.fillStyle = '#64748b';
-      ctx.beginPath();
-      ctx.arc(-60, 36, 8, 0, Math.PI * 2);
-      ctx.arc(60, 36, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.arc(-60, 36, 5, 0, Math.PI * 2);
-      ctx.arc(60, 36, 5, 0, Math.PI * 2);
-      ctx.fill();
+      // Quad Rear Exhaust Pipes (M-Sport Diffuser)
+      ctx.save();
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(-75, 34, 150, 12); // Diffuser fins
 
-      // Rear Wheels
-      ctx.fillStyle = '#090d16';
-      ctx.fillRect(-142, 10, 16, 32);
-      ctx.fillRect(126, 10, 16, 32);
+      [-62, -48, 48, 62].forEach((xPos) => {
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath();
+        ctx.arc(xPos, 38, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#090d16';
+        ctx.beginPath();
+        ctx.arc(xPos, 38, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
 
       ctx.restore();
 
