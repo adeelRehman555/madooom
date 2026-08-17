@@ -422,8 +422,48 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
     return () => clearInterval(interval);
   }, [isBoosting]);
 
+  // Synthesizes authentic BMW sports car dual-tone car horn sound using Web Audio API
+  const playBMWHornSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const audioCtx = new AudioCtx();
+
+      // Dual-tone BMW horn frequencies (~435Hz & ~365Hz with harmonics)
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc2.type = 'sawtooth';
+
+      osc1.frequency.setValueAtTime(435, audioCtx.currentTime); // High Freq
+      osc2.frequency.setValueAtTime(365, audioCtx.currentTime); // Low Freq
+
+      // Envelope: fast attack, steady sustain, clean decay
+      gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.04);
+      gainNode.gain.setValueAtTime(0.35, audioCtx.currentTime + 0.55);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.75);
+
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc1.start();
+      osc2.start();
+
+      osc1.stop(audioCtx.currentTime + 0.78);
+      osc2.stop(audioCtx.currentTime + 0.78);
+    } catch (err) {
+      console.error('Audio play error:', err);
+    }
+  };
+
   const handleHonk = () => {
     setIsHonking(true);
+    playBMWHornSound();
     setTimeout(() => setIsHonking(false), 800);
   };
 
