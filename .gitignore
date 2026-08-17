@@ -12,11 +12,15 @@ dist/
 build/
 
 # Local Environment Variables
+.env*
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Unneeded assets uploaded to Cloudinary
+public/madam.png
 
 # Editor & System Files
 .DS_Store
