@@ -92,15 +92,15 @@ Visit: **http://localhost:5173/**
 ### Database Connection String
 File: `.env.local`
 ```
-VITE_DATABASE_URL=postgresql://neondb_owner:npg_A6ogtUzW0ylD@ep-sparkling-voice-ao8xygo9-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+VITE_DATABASE_URL=postgresql://user:password@ep-your-neon-endpoint.neon.tech/neondb?sslmode=require
 ```
 
 ### Cloudinary Credentials
 File: `.env.local`
 ```
-VITE_CLOUDINARY_CLOUD_NAME=dz7kj0glb
-VITE_CLOUDINARY_API_KEY=817126563147378
-VITE_CLOUDINARY_API_SECRET=BfWf1hlxi79uUZr7sgDBvhYzfwg
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_API_KEY=your_api_key
+VITE_CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ---
