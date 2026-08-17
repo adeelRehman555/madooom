@@ -7,34 +7,53 @@ interface TwoFAProps {
   onVerificationSuccess: () => void;
 }
 
+type OptionType = 'cute' | 'batameez' | 'beautiful';
+
 const TwoFA: React.FC<TwoFAProps> = ({ nickname, dob, onVerificationSuccess }) => {
-  const [secretWord, setSecretWord] = useState('');
-  const [error, setError] = useState('');
+  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const [feedback, setFeedback] = useState<{ text: string; isSuccess: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  const handleOptionSelect = (option: OptionType) => {
+    setSelectedOption(option);
+    setFeedback(null);
+  };
+
   const handleVerification = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setFeedback(null);
 
-    if (!secretWord.trim()) {
-      setError('Please enter the secret word 🤫');
+    if (!selectedOption) {
+      setFeedback({ text: 'Please select an option first! 🤫', isSuccess: false });
       setIsShaking(true);
-      setLoading(false);
       return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // This is a mock verification. In a real app, you'd verify this on the backend.
-    if (secretWord === '32') {
+    if (selectedOption === 'batameez') {
+      setFeedback({
+        text: 'You Goddam Right! 😎😈🔥',
+        isSuccess: true,
+      });
       storeAuthToken(nickname, dob);
-      onVerificationSuccess();
-    } else {
-      setError('That\'s not the magic word. Try again! 💖');
+      setTimeout(() => {
+        onVerificationSuccess();
+      }, 1200);
+    } else if (selectedOption === 'cute') {
+      setFeedback({
+        text: 'Partially correct Hahaha 🤪😂',
+        isSuccess: false,
+      });
       setIsShaking(true);
-      setSecretWord('');
+    } else if (selectedOption === 'beautiful') {
+      setFeedback({
+        text: "It's Right you are Beautiful, But Nahh 😜👑✨",
+        isSuccess: false,
+      });
+      setIsShaking(true);
     }
 
     setLoading(false);
@@ -47,9 +66,30 @@ const TwoFA: React.FC<TwoFAProps> = ({ nickname, dob, onVerificationSuccess }) =
     }
   }, [isShaking]);
 
+  const options = [
+    {
+      id: 'cute' as OptionType,
+      label: 'A) Cute',
+      emoji: '🌸',
+      subtext: 'So sweet & soft 💕',
+    },
+    {
+      id: 'batameez' as OptionType,
+      label: 'B) Batameez',
+      emoji: '😈',
+      subtext: 'Naughty & dramatic 😜',
+    },
+    {
+      id: 'beautiful' as OptionType,
+      label: 'C) Beautiful',
+      emoji: '👑',
+      subtext: 'Gorgeous queen ✨',
+    },
+  ];
+
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-200 via-pink-200 to-rose-200 font-sans">
-      {/* Animated background elements from Login page can be reused here */}
+      {/* Animated background elements */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {[...Array(30)].map((_, i) => (
           <div
@@ -87,34 +127,63 @@ const TwoFA: React.FC<TwoFAProps> = ({ nickname, dob, onVerificationSuccess }) =
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2 animate-gradient-x">
               One Last Step
             </h1>
-            <p className="text-pink-400 text-sm md:text-base font-medium mt-1">
-              Whisper the secret phrase to unlock your surprise...
+            <p className="text-pink-500 text-sm md:text-base font-medium mt-1">
+              Answer honestly to unlock your surprise... 💖
             </p>
           </div>
 
           <form onSubmit={handleVerification} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="secretWord" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <span>🤫</span> What is the Size ?
+            <div className="space-y-3">
+              <label className="text-base md:text-lg font-bold text-gray-800 flex items-center justify-center gap-2 text-center">
+                <span>🤫</span> Ap Zyda Kya Ho ? <span>❓</span>
               </label>
-              <div className="relative group">
-                <input
-                  id="secretWord"
-                  type="password"
-                  value={secretWord}
-                  onChange={(e) => setSecretWord(e.target.value)}
-                  placeholder="Enter the secret size..."
-                  className="w-full px-5 py-3.5 pr-12 border-2 border-purple-200 rounded-2xl text-sm transition-all duration-300 bg-white/80 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:bg-white focus:shadow-lg focus:shadow-purple-200/50 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                  disabled={loading}
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none transition-transform group-focus-within:scale-110">💖</span>
+
+              <div className="space-y-3 pt-2">
+                {options.map((opt) => {
+                  const isSelected = selectedOption === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => handleOptionSelect(opt.id)}
+                      className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group text-left ${
+                        isSelected
+                          ? 'border-purple-500 bg-purple-50/90 shadow-md shadow-purple-200/50 scale-[1.02]'
+                          : 'border-purple-100 bg-white/70 hover:border-purple-300 hover:bg-purple-50/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl transition-transform group-hover:scale-110">
+                          {opt.emoji}
+                        </span>
+                        <div>
+                          <p className={`font-semibold text-sm md:text-base ${isSelected ? 'text-purple-700 font-bold' : 'text-gray-700'}`}>
+                            {opt.label}
+                          </p>
+                          <p className="text-xs text-gray-400">{opt.subtext}</p>
+                        </div>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        isSelected ? 'border-purple-500 bg-purple-500' : 'border-gray-300'
+                      }`}>
+                        {isSelected && <span className="text-white text-xs font-bold">✓</span>}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-xl text-sm animate-slide-in shadow-sm">
-                <span className="text-lg">💔</span>
-                <span>{error}</span>
+            {feedback && (
+              <div
+                className={`flex items-center gap-2 p-4 rounded-xl text-sm animate-slide-in shadow-sm border-l-4 ${
+                  feedback.isSuccess
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-800 font-semibold'
+                    : 'bg-rose-50 border-rose-400 text-rose-700 font-medium'
+                }`}
+              >
+                <span className="text-xl">{feedback.isSuccess ? '🎉' : '😜'}</span>
+                <span>{feedback.text}</span>
               </div>
             )}
 
@@ -126,7 +195,7 @@ const TwoFA: React.FC<TwoFAProps> = ({ nickname, dob, onVerificationSuccess }) =
               {loading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  <span>Verifying...</span>
+                  <span>Checking answer...</span>
                 </>
               ) : (
                 <>

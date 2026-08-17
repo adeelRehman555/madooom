@@ -49,8 +49,8 @@ export const clearAuthToken = (): void => {
 // Simple validation - matches the credentials from your Login page
 export const validateCredentials = (nickname: string, dob: string): boolean => {
   // These are the credentials that will work
-  const expectedNickname = 'Nibi';
-  const expectedDob = '2003-05-19'; // Format: YYYY-MM-DD
+  const expectedNickname = 'Cutie';
+  const expectedDob = '2005-08-18'; // Format: YYYY-MM-DD
   
   return nickname.toLowerCase() === expectedNickname.toLowerCase() && 
          dob === expectedDob;

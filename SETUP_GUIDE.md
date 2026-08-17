@@ -61,8 +61,8 @@ Visit: **http://localhost:5173/**
 ## 📱 Testing the App
 
 ### Login Flow
-1. Enter nickname: **nibi** (case-insensitive)
-2. Select date: **May 19, 2003**
+1. Enter nickname: **cutie** (case-insensitive)
+2. Select date: **August 18, 2005**
 3. Answer 2FA question: **32**
 4. You're in! 🎉
 

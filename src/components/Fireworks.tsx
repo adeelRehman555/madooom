@@ -31,7 +31,7 @@ const Fireworks: React.FC = () => {
     // Generate firework particles
     const particles: FireworkParticle[] = [];
     const colors = ['#ff6b9d', '#ff4d6d', '#ff8fa3', '#ffb3c6', '#ffc2d1', '#ff69b4', '#ff1493', '#ff85b3', '#ff99cc', '#ffb347'];
-    
+
     for (let i = 0; i < 80; i++) {
       particles.push({
         id: i,
@@ -48,7 +48,7 @@ const Fireworks: React.FC = () => {
     // Generate confetti pieces
     const confetti: ConfettiPiece[] = [];
     const confettiColors = ['#ff6b9d', '#ff4d6d', '#ff8fa3', '#ffb3c6', '#ffc2d1', '#ff69b4', '#ff1493', '#ffd700', '#ffa500', '#ff6347'];
-    
+
     for (let i = 0; i < 150; i++) {
       confetti.push({
         id: i,
@@ -161,7 +161,7 @@ const Fireworks: React.FC = () => {
         {/* Glitter text */}
         <div className="glitter-text-container">
           <div className="glitter-text">✨ HAPPY BIRTHDAY! ✨</div>
-          <div className="glitter-subtext">🎉 Nibi Darling aka Aniba Azam 🎉</div>
+          <div className="glitter-subtext">🎉 Aqsa the Cutie🎉</div>
         </div>
 
         {/* Balloons */}

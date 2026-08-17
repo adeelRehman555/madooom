@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getStoredCredentials, clearAuthToken } from '../lib/auth';
 import Navbar from './Navbar';
 import Fireworks from './Fireworks';
+import BMW3DScene from './BMW3DScene';
+import Hamster from './Hamster';
 import './Fireworks.css';
 
 interface HomeProps {
@@ -31,6 +33,57 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
   const [yearPlan, setYearPlan] = useState('');
   const [review, setReview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Madam Special Image
+  const MADAM_IMAGE_URL = 'https://res.cloudinary.com/dz7kj0glb/image/upload/v1786948792/birthday_app/madam_special.png';
+  const [showMadamFullscreen, setShowMadamFullscreen] = useState(false);
+
+  const handleDownloadMadamImage = async () => {
+    try {
+      const response = await fetch(MADAM_IMAGE_URL);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'madam-aqsa-special.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      window.open(MADAM_IMAGE_URL, '_blank');
+    }
+  };
+
+  // BMW 3D Car state
+  const [carInput, setCarInput] = useState('');
+  const [carError, setCarError] = useState('');
+  const [carSuccess, setCarSuccess] = useState('');
+  const [show3DCar, setShow3DCar] = useState(false);
+  const [isCarShaking, setIsCarShaking] = useState(false);
+
+  const handleCarSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCarError('');
+    setCarSuccess('');
+
+    const trimmed = carInput.trim().toLowerCase();
+    if (!trimmed) {
+      setCarError('Please enter your favorite car name! 🏎️');
+      setIsCarShaking(true);
+      setTimeout(() => setIsCarShaking(false), 600);
+      return;
+    }
+
+    if (trimmed === 'bmw' || trimmed.includes('bmw')) {
+      setCarSuccess('Bingo! You unlocked your dream BMW! 🏎️💨✨');
+      setShow3DCar(true);
+    } else {
+      setCarError("Hmm... that's a cool car, but not your absolute favorite dream car! Try again 😉 (Hint: 3 letters starting with B 🏎️)");
+      setIsCarShaking(true);
+      setTimeout(() => setIsCarShaking(false), 600);
+    }
+  };
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -82,9 +135,9 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
 
     // Open default email client
     window.location.href = `mailto:ajadeel229@gmail.com?subject=${emailSubject}&body=${emailBody}`;
-    
+
     setIsSubmitting(false);
-    
+
     // Optional: Show success message
     alert('📧 Your email client has been opened! Please send the email to complete your review. Thank you so much for your feedback! 💕');
   };
@@ -92,6 +145,7 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
   return (
     <>
       {showFireworks && <Fireworks />}
+      <Hamster />
       <Navbar currentPage="home" onLogoutClick={handleLogoutClick} onNavigate={onNavigate} />
       <div className={`relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-pink-200 via-rose-100 to-purple-200 font-sans p-4 pt-20 md:pt-24 transition-filter duration-1000 ${isBlurred ? 'blur-lg' : ''}`}>
         {/* Animated floating hearts background */}
@@ -171,67 +225,187 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
           <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-white/40 animate-slide-up mb-6 md:mb-8">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-400 rounded-t-3xl animate-gradient-shift"></div>
             <div className="absolute -top-2 -right-2 text-2xl animate-float-slow">💌</div>
-            
+
             <div className="prose prose-pink max-w-none">
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                Happy birthday to the cutest, modest, brightest, elegant, crimson queen, my nibi darling - Aniba gujjeri 🙂. 
-                I am wishing you this birthday with great love and care 😘, you are my therapist, my mentor and my darling 💓. 
+                Happy birthday to the cutest, modest, brightest, elegant, crimson queen, my darling friend - Aqsa the Cutie🙂.
+                I am wishing you this birthday with great love and care 😘💓.
                 May this day become the most happy day for you and wishing you many returns of the day.
               </p>
 
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                I wanted to gift you something that would not be forgotten, would not get old, would not break, 
-                or not even get lost, it will be there as it is now forever and will be for you always. So i am 
-                aiming that nobody gives you anything like this 😎, and my gift is most special 😂. I hope you will 
-                like it. Explore it there is everything for you, i have added all the photos and videos which i had, 
-                you can upload more and save them here, i have made it fully secured and encrypted so nobody can 
-                access it other than you. So don't worry about it and use it as your google drive. You got 25 GBs 😂.
+                I wanted to gift you something that would not be forgotten, would not get old, would not break,
+                or not even get lost, it will be there as it is now forever and will be for you always. So i am
+                aiming that nobody gives you anything like this 😎, and my gift is most special 😂. I hope you will
+                like it. Explore it there is everything for you.
               </p>
 
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                I don't know how we even became friends and that was a good time, calling with you is a good time 
-                pass and gossips things 😂, you are a really good, kind and pure heart person, i have seen your heart 
-                when you sent me picture in once mode 😭, it is very innocent 😇. And i wanted to get more space in 
-                your heart you know 😂, so don't worry about anything you will nail it one day and become a successful 
-                aurat. You can share anything with me your wishes, your sorrow, your happiness everything. I got your 
-                back because you know i have seen it too in once mode 😭.
+                I don't know how we even became friends and that was a good time, making you angry, teasing you and flirting with you 😂,
+                you are a really good, kind and pure heart person, i have seen your heart with one dot on it(Til Apka 😂)
+                it is very innocent 😇. And i wanted to get more space in
+                your heart you know 😂, so don't worry about anything you will nail it one day and become a successful.
               </p>
 
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                I know sometimes you get breathing problem, i can give you mouth-to-mouth CPR 🥹 so you get more oxygen, 
-                and i can also hold the weight on your chest if you want because sometimes you really feel low 🥺. 
-                Just kidding Nibi - how much i am filtering and i don't even being scared of you why ? Why ? Why ?
+                I have proposed to you so many times, and you rejected me every single time 😂💔 — but honestly, I never minded because, as you know, **I don’t believe in giving up**. Hahaha! 🤣 At this point, I think it’s better that we just stay friends because friendship has no fights, no expectations, no unnecessary drama, and most importantly… no rejection applications pending every other week 😂😂.
+
+                Although, I have to confess… I still have a *lil dirty eye* on you 👀😂. You know, I really love your waist hahaha 😭🤣. So please, at least allow me to **“ke ghalat nazar daal sakoon aap pe… in a good way”** 😂😂. Just kidding before you pick up a slipper and come after me! 🏃‍♂️💨🤣
+
+                BTW, you are honestly a very unique definition of beauty 😌✨ — a beautiful combination of **maturity, beauty, Angry Bird 🐦, skinny figure, constant fighting, and unlimited batameezi** 😂😭. You somehow manage to look cute while being angry, elegant while fighting, and innocent while doing full-time batameezi 😂.
+
+                But honestly, jokes aside, you’re genuinely a beautiful and amazing person. ❤️ Stay the same… just maybe reduce the fighting and batameezi by 2% 😂🙏.
+
               </p>
 
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                I have proposed to you many times but you rejected me 😂, and i don't mind and being a friend is more 
-                beautiful because there are no expectations and fights between us. But you want a dirty gujjer 🥲 over 
-                a boy like me a handsome, software engineer and also hard working, you know hard working 😂, that gujjer 
-                nigga will got these beautiful eyes, attractive lips, killer neck, gorgeous pair of ☹️☹️, and other things 😂. 
-                He will use you, and it's better to get used, because you are so useless 😂, and always in sleep mode. 
-                You will give you good ragra everyday because you always mess with mental health 😂, and he will probably 
-                get angry and full fill your dark wishes 😘, that's compulsory miss Aniba 😂, BTW i will be jealous because 
-                he will use you, because i also wanted to get this opportunity at least once 🙂, nahhh you shocked, i was 
-                just kidding 😂, there is nothing like that, there is even more darkness 😂 , again just making fun of you 
-                don't get serious, maybe i wanted this, hahahah you are getting confused but you know 😂. Just forget it, 
-                that was a little dirty part, i hope you will like it and forget it. 😁
+                Ok, let's get serious, Happy birthday again my darling, sweetie, cutie Aqsa. Be happy on this day,
+                i have added a wish list area too, so add your wishes there on this birthday and try hard to achieve them. which I know you won't😭🤣.
               </p>
 
               <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                Ok, let's get serious, Happy birthday again my darling, sweetie, cutie Nibo. Be happy on this day, 
-                i have added a wish list area too, so add your wishes there on this birthday and try hard to achieve them.
-              </p>
-
-              <p className="text-gray-800 leading-relaxed mb-4 text-base md:text-lg">
-                I hope you will like this gift and keep it safe 🙂, i have worked a little hard for you to impress you 
-                on your special day. You can review this gift also and send it through mail to me. If you are so happy 
-                and liked it and you really wanted to thanks me then send a once mode with pair of ☹️☹️, hahaha just 
+                I hope you will like this gift and keep it safe 🙂, i have worked a little hard for you to impress you
+                on your special day. You can review this gift also and send it through mail to me. If you are so happy
+                and liked it and you really wanted to thanks me then send a cute video of your saying thanks to me in a filmi style ☹️☹️, hahaha just
                 kidding 😂 but if you like to send then please 🥺, I really wanted to explore your heart 😭.
               </p>
 
               <p className="text-rose-600 font-bold text-center text-xl md:text-2xl mt-6 pt-4 border-t-2 border-pink-200">
-                Happy Birthday Again Nibi Darling aka Abiba Azam 💕
+                Happy Birthday Again Aqsa Darling Aka Cutie Pie - Hamster ki Dewani 💕
               </p>
+            </div>
+          </div>
+
+          {/* Birthday Wishlist Section Card */}
+          <div
+            onClick={() => onNavigate && onNavigate('wishlist')}
+            className="relative bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white rounded-3xl p-6 md:p-8 shadow-2xl border border-white/40 mb-8 overflow-hidden animate-slide-up text-center group cursor-pointer hover:scale-[1.02] transition-all duration-300"
+          >
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-300 via-pink-200 to-yellow-300 rounded-t-3xl animate-gradient-shift"></div>
+            <div className="absolute -top-3 -left-3 text-3xl animate-bounce-slow">🎁</div>
+            <div className="absolute -top-3 -right-3 text-3xl animate-float-slow">✨</div>
+
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform">
+              📜
+            </div>
+
+            <h2 className="text-2xl md:text-3xl font-extrabold mb-2 text-white drop-shadow-md">
+              Your Birthday Wishlist 🎁✨
+            </h2>
+            <p className="text-white/90 text-sm md:text-base max-w-md mx-auto mb-6 font-medium">
+              View & add your special birthday wishes and desires! Tap below to open your Wishlist page. 🌸
+            </p>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNavigate) onNavigate('wishlist');
+              }}
+              className="px-8 py-4 bg-white text-rose-600 font-bold rounded-2xl shadow-xl hover:bg-rose-50 transition-all duration-300 hover:scale-105 active:scale-98 inline-flex items-center gap-2 text-base md:text-lg group-hover:shadow-2xl"
+            >
+              <span>Open Your Wishlist 📜✨</span>
+              <span className="text-xl transition-transform group-hover:translate-x-1">→</span>
+            </button>
+          </div>
+
+          {/* Madam Special Portrait Card */}
+          <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-pink-200/60 mb-8 animate-slide-up overflow-hidden text-center">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 rounded-t-3xl animate-gradient-shift"></div>
+            <div className="absolute -top-3 -left-3 text-3xl animate-bounce-slow">👑</div>
+            <div className="absolute -top-3 -right-3 text-3xl animate-float-slow">✨</div>
+
+            <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-pink-600 via-rose-500 to-purple-600 bg-clip-text text-transparent mb-2">
+              Special Portrait for Madam Aqsa 👑✨
+            </h2>
+            <p className="text-gray-600 text-sm md:text-base mb-6">
+              Fetched live from Cloudinary! Tap to view full screen or download.
+            </p>
+
+            {/* Image Frame */}
+            <div className="relative group max-w-xs md:max-w-sm mx-auto overflow-hidden rounded-3xl shadow-xl border-4 border-pink-200 bg-gradient-to-br from-pink-50 to-rose-50">
+              <img
+                src={MADAM_IMAGE_URL}
+                alt="Madam Special"
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+                onClick={() => setShowMadamFullscreen(true)}
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 p-4">
+                <button
+                  onClick={() => setShowMadamFullscreen(true)}
+                  className="px-4 py-2 bg-white/90 hover:bg-white text-pink-600 font-bold rounded-full text-xs md:text-sm shadow-lg transition-transform hover:scale-110"
+                >
+                  🔍 View Fullscreen
+                </button>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mt-6">
+              <button
+                onClick={() => setShowMadamFullscreen(true)}
+                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-pink-400/40 transition-all hover:scale-105 active:scale-98 flex items-center gap-2 text-sm md:text-base"
+              >
+                <span>🔍 View Full Screen</span>
+              </button>
+              <button
+                onClick={handleDownloadMadamImage}
+                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-purple-400/40 transition-all hover:scale-105 active:scale-98 flex items-center gap-2 text-sm md:text-base"
+              >
+                <span>📥 Download Photo</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Dedicated 3D BMW Car Card */}
+          <div className={`relative bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-2xl border border-purple-500/30 mb-8 overflow-hidden transition-all duration-300 ${isCarShaking ? 'animate-shake' : ''}`}>
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-pink-500 rounded-t-3xl animate-gradient-shift"></div>
+            <div className="absolute -top-3 -right-3 text-3xl animate-bounce-slow">🏎️</div>
+
+            <div className="text-center max-w-lg mx-auto">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-blue-600/30 border border-blue-400/50 flex items-center justify-center text-3xl shadow-lg shadow-blue-500/30">
+                🏎️
+              </div>
+
+              <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-400 via-pink-400 to-amber-300 bg-clip-text text-transparent mb-2">
+                Unlock Your Dream Car Ride 🏎️✨
+              </h2>
+              <p className="text-gray-300 text-sm md:text-base mb-6">
+                Tell me... what is your ultimate favorite dream car? Enter its name to launch a 3D ride!
+              </p>
+
+              <form onSubmit={handleCarSubmit} className="space-y-4">
+                <div className="relative group max-w-md mx-auto">
+                  <input
+                    type="text"
+                    value={carInput}
+                    onChange={(e) => setCarInput(e.target.value)}
+                    placeholder="Enter car name (e.g. BMW)..."
+                    className="w-full px-5 py-3.5 pr-12 border-2 border-purple-400/40 rounded-2xl text-sm transition-all duration-300 bg-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:bg-white/20 focus:shadow-lg focus:shadow-cyan-500/30"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none">🚗</span>
+                </div>
+
+                {carError && (
+                  <div className="flex items-center gap-2 p-3 bg-rose-500/20 border border-rose-400/50 text-rose-200 rounded-xl text-xs md:text-sm animate-slide-in justify-center">
+                    <span>💔</span>
+                    <span>{carError}</span>
+                  </div>
+                )}
+
+                {carSuccess && (
+                  <div className="flex items-center gap-2 p-3 bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 rounded-xl text-xs md:text-sm animate-slide-in justify-center font-semibold">
+                    <span>🎉</span>
+                    <span>{carSuccess}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full max-w-md mx-auto py-3.5 px-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold rounded-2xl transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-98 flex items-center justify-center gap-2"
+                >
+                  <span>Launch 3D Ride 🏎️💨</span>
+                </button>
+              </form>
             </div>
           </div>
 
@@ -251,7 +425,7 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
             <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-white/40 animate-slide-up mb-6 md:mb-8">
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-400 rounded-t-3xl animate-gradient-shift"></div>
               <div className="absolute -top-2 -left-2 text-2xl animate-float-slow">📋</div>
-              
+
               <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent mb-6 text-center">
                 Share Your Thoughts 💭
               </h2>
@@ -264,15 +438,14 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
                     <span className="text-2xl">1️⃣</span> How much will you rate this gift on scale of 10?
                   </label>
                   <div className="flex flex-wrap gap-3">
-                    {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                       <button
                         key={num}
                         onClick={() => setRating(num.toString())}
-                        className={`w-12 h-12 rounded-full font-bold transition-all duration-200 ${
-                          rating === num.toString()
-                            ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg scale-110'
-                            : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
-                        }`}
+                        className={`w-12 h-12 rounded-full font-bold transition-all duration-200 ${rating === num.toString()
+                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg scale-110'
+                          : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
+                          }`}
                       >
                         {num}
                       </button>
@@ -301,31 +474,28 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
                   <div className="flex gap-4">
                     <button
                       onClick={() => setFlirtingAnswer('Yes, it annoys me sometimes 😢')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                        flirtingAnswer === 'Yes, it annoys me sometimes 😢'
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                          : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
-                      }`}
+                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${flirtingAnswer === 'Yes, it annoys me sometimes 😢'
+                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                        : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
+                        }`}
                     >
                       Yes 😢
                     </button>
                     <button
                       onClick={() => setFlirtingAnswer('No, it makes me smile 😊')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                        flirtingAnswer === 'No, it makes me smile 😊'
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                          : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
-                      }`}
+                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${flirtingAnswer === 'No, it makes me smile 😊'
+                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                        : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
+                        }`}
                     >
                       No 😊
                     </button>
                     <button
                       onClick={() => setFlirtingAnswer('Sometimes it\'s funny, sometimes annoying 🤪')}
-                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                        flirtingAnswer === 'Sometimes it\'s funny, sometimes annoying 🤪'
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
-                          : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
-                      }`}
+                      className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all duration-200 ${flirtingAnswer === 'Sometimes it\'s funny, sometimes annoying 🤪'
+                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg'
+                        : 'bg-white/80 text-gray-700 hover:bg-pink-100 border-2 border-pink-200'
+                        }`}
                     >
                       Both 🤪
                     </button>
@@ -395,23 +565,63 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
         </div>
       </div>
 
+      {/* Madam Fullscreen Image Lightbox Modal */}
+      {showMadamFullscreen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in select-none">
+          <button
+            onClick={() => setShowMadamFullscreen(false)}
+            className="absolute top-4 right-4 z-50 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xl flex items-center justify-center transition-all"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+
+          <div className="relative max-w-4xl max-h-[90vh] flex flex-col items-center justify-center">
+            <img
+              src={MADAM_IMAGE_URL}
+              alt="Madam Special Fullscreen"
+              className="max-w-full max-h-[75vh] md:max-h-[80vh] object-contain rounded-2xl shadow-2xl border-2 border-white/20 animate-scale-up"
+            />
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-4">
+              <button
+                onClick={handleDownloadMadamImage}
+                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-2xl hover:shadow-xl transition-transform hover:scale-105 flex items-center gap-2 text-sm md:text-base"
+              >
+                <span>📥 Download Original Photo</span>
+              </button>
+              <button
+                onClick={() => setShowMadamFullscreen(false)}
+                className="px-6 py-3 bg-white/20 hover:bg-white/30 text-white font-bold rounded-2xl transition-all text-sm md:text-base"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full-Screen 3D BMW Ride Modal */}
+      {show3DCar && (
+        <BMW3DScene onClose={() => setShow3DCar(false)} />
+      )}
+
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className="relative bg-white rounded-3xl max-w-md w-full mx-4 shadow-2xl animate-scale-up overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-pink-400 via-rose-400 to-pink-400"></div>
-            
+
             <div className="p-6 md:p-8 text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center animate-bounce-slow">
                 <span className="text-4xl">💔</span>
               </div>
-              
+
               <h3 className="text-2xl font-bold text-gray-800 mb-2">Wait! Don't Go!</h3>
-              
+
               <p className="text-gray-600 mb-6">
                 Are you sure you want to logout? You'll need to verify your birthday again to come back.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleConfirmLogout}
@@ -427,7 +637,7 @@ const Home: React.FC<HomeProps> = ({ onLogout, onNavigate }) => {
                 </button>
               </div>
             </div>
-            
+
             <div className="absolute -bottom-2 -left-2 text-2xl opacity-30 animate-float-slow">🎀</div>
             <div className="absolute -top-2 -right-2 text-2xl opacity-30 animate-float-slow animation-delay-1000">🌸</div>
           </div>

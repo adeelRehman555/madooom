@@ -53,8 +53,17 @@ const App: React.FC = () => {
   };
 
   const handleNavigate = (page: string) => {
+    const isValid = verifyAuthToken();
+    if (!isValid) {
+      setAuth({ step: 'login', nickname: '', dob: '' });
+      return;
+    }
     setAuth((prev) => ({ ...prev, step: page as AuthStep }));
   };
+
+  // Protected route guard: Ensure unauthenticated users are forced to login
+  const isAuthValid = verifyAuthToken();
+  const currentStep = isAuthValid ? auth.step : (auth.step === '2fa' ? '2fa' : 'login');
 
   if (isLoading) {
     return (
@@ -69,29 +78,29 @@ const App: React.FC = () => {
 
   return (
     <>
-      {auth.step === 'login' && (
+      {currentStep === 'login' && (
         <Login onLoginSuccess={handleLoginSuccess} />
       )}
-      {auth.step === '2fa' && (
+      {currentStep === '2fa' && (
         <TwoFA
           nickname={auth.nickname}
           dob={auth.dob}
           onVerificationSuccess={handle2FASuccess}
         />
       )}
-      {auth.step === 'home' && (
+      {currentStep === 'home' && (
         <Home 
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       )}
-      {auth.step === 'pictures' && (
+      {currentStep === 'pictures' && (
         <Pictures onLogoutClick={handleLogout} onNavigate={handleNavigate} />
       )}
-      {auth.step === 'videos' && (
+      {currentStep === 'videos' && (
         <Videos onLogoutClick={handleLogout} onNavigate={handleNavigate} />
       )}
-      {auth.step === 'wishlist' && (
+      {currentStep === 'wishlist' && (
         <Wishlist onLogoutClick={handleLogout} onNavigate={handleNavigate} />
       )}
     </>
