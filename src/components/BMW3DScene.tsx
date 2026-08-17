@@ -422,6 +422,102 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
     return () => clearInterval(interval);
   }, [isBoosting]);
 
+  // 1. Synthesizes Color Change Chime Sound
+  const playColorChangeSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1040, ctx.currentTime + 0.12);
+
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.16);
+    } catch (e) {}
+  };
+
+  // 2. Synthesizes Turbo Nitro Boost Roar Sound
+  const playNitroBoostSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      // Turbo Spool Whine
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(300, ctx.currentTime);
+      osc1.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.5);
+
+      gain1.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+
+      // Exhaust Flame Roar
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sawtooth';
+      osc2.frequency.setValueAtTime(140, ctx.currentTime);
+      osc2.frequency.exponentialRampToValueAtTime(340, ctx.currentTime + 0.4);
+
+      gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+
+      osc1.start();
+      osc2.start();
+      osc1.stop(ctx.currentTime + 0.55);
+      osc2.stop(ctx.currentTime + 0.55);
+    } catch (e) {}
+  };
+
+  // 3. Continuous Sports Engine Motor Sound Loop
+  useEffect(() => {
+    let ctx: AudioContext | null = null;
+    let osc: OscillatorNode | null = null;
+    let gain: GainNode | null = null;
+
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        ctx = new AudioCtx();
+        osc = ctx.createOscillator();
+        gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        // Base engine idling/cruising frequency (higher pitch when nitro is active)
+        const freq = isBoosting ? 220 : 95;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        gain.gain.setValueAtTime(isBoosting ? 0.12 : 0.05, ctx.currentTime);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+      }
+    } catch (e) {}
+
+    return () => {
+      if (osc) osc.stop();
+      if (ctx) ctx.close();
+    };
+  }, [isBoosting]);
+
   // Synthesizes authentic BMW sports car dual-tone car horn sound using Web Audio API
   const playBMWHornSound = () => {
     try {
@@ -467,7 +563,15 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
     setTimeout(() => setIsHonking(false), 800);
   };
 
+  const triggerNitro = (boosting: boolean) => {
+    setIsBoosting(boosting);
+    if (boosting) {
+      playNitroBoostSound();
+    }
+  };
+
   const nextColor = () => {
+    playColorChangeSound();
     setColorIndex((prev) => (prev + 1) % CAR_COLORS.length);
   };
 
@@ -564,10 +668,14 @@ const BMW3DScene: React.FC<BMW3DSceneProps> = ({ onClose }) => {
 
           {/* 3. Turbo Boost Button (Hold or Click) */}
           <button
-            onMouseDown={() => setIsBoosting(true)}
-            onMouseUp={() => setIsBoosting(false)}
-            onTouchStart={() => setIsBoosting(true)}
-            onTouchEnd={() => setIsBoosting(false)}
+            onMouseDown={() => triggerNitro(true)}
+            onMouseUp={() => triggerNitro(false)}
+            onTouchStart={() => triggerNitro(true)}
+            onTouchEnd={() => triggerNitro(false)}
+            onClick={() => {
+              triggerNitro(true);
+              setTimeout(() => triggerNitro(false), 800);
+            }}
             className={`py-3 px-3 rounded-2xl border text-xs md:text-sm font-bold flex flex-col items-center justify-center gap-1 transition-all shadow-lg ${
               isBoosting
                 ? 'bg-gradient-to-r from-rose-500 to-red-600 border-rose-400 text-white scale-105 shadow-rose-500/50'
